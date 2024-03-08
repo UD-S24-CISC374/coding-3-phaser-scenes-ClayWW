@@ -13,18 +13,17 @@ export default class PlainScene extends Phaser.Scene {
     }
 
     create() {
-        // Adjust the size and position according to your game's design
         this.add.image(400, 300, "plains").setOrigin(0.5, 0.5).setScale(2);
 
         // Platforms
         this.platforms = this.physics.add.staticGroup();
         const gameWidth = this.scale.width;
-        const platformOriginalWidth = 400; // Adjust this based on your actual platform image width
+        const platformOriginalWidth = 400;
         const scale = gameWidth / platformOriginalWidth + 10;
 
         this.platforms
             .create(400, this.scale.height - 32, "platform")
-            .setScale(scale, 1) // Scale horizontally to fit the screen width, and keep vertical scale as is
+            .setScale(scale, 1)
             .refreshBody();
         // Player
         this.player = this.physics.add.sprite(100, 450, "player");
@@ -63,9 +62,7 @@ export default class PlainScene extends Phaser.Scene {
         // Cursors
         this.cursors = this.input.keyboard?.createCursorKeys();
 
-        // Coins setup (similar to stars in your example)
-        // Coins setup (adjusted for full coverage)
-        const numStars = Math.floor(this.scale.width / 70) - 1; // Assuming each star is roughly 70 pixels apart
+        const numStars = Math.floor(this.scale.width / 70) - 1;
         this.coins = this.physics.add.group({
             key: "coin",
             repeat: numStars,
@@ -122,19 +119,15 @@ export default class PlainScene extends Phaser.Scene {
             | Phaser.Types.Physics.Arcade.GameObjectWithBody
             | Phaser.Tilemaps.Tile
     ) {
-        // Safely cast the coin to the type we expect (Phaser.Physics.Arcade.Image)
         const collectedCoin = coin as Phaser.Physics.Arcade.Image;
 
-        // Disable the coin
         collectedCoin.disableBody(true, true);
 
-        // Update the score
         let score = this.registry.get("coins") || 0;
         this.registry.set("coins", score + 10);
         this.scoreText.setText("Score: " + this.registry.get("coins"));
 
         if (this.coins.countActive(true) === 0) {
-            // Transition to OceanScene
             this.scene.start("OceanScene", { score: score });
         }
     }

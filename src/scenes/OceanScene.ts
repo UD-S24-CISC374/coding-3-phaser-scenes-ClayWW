@@ -13,7 +13,6 @@ export default class OceanScene extends Phaser.Scene {
     }
 
     create() {
-        // Ocean background
         this.add.image(600, 200, "ocean").setOrigin(0.5, 0.5).setScale(3.5);
 
         // Platforms

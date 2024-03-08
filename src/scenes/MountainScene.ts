@@ -13,7 +13,6 @@ export default class MountainScene extends Phaser.Scene {
     }
 
     create() {
-        // Ocean background
         this.add.image(600, 200, "mountain").setOrigin(0.5, 0.5).setScale(3);
 
         // Platforms
