@@ -7,14 +7,15 @@ export default class MountainScene extends Phaser.Scene {
     private score = 0;
     private scoreText: Phaser.GameObjects.Text;
     private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+    private winText: Phaser.GameObjects.Text | null = null;
 
     constructor() {
-        super({ key: "MountainScene" });
+        super({ key: "CaveScene" });
     }
 
     create() {
         // Ocean background
-        this.add.image(600, 200, "mountain").setOrigin(0.5, 0.5).setScale(3);
+        this.add.image(400, 300, "cave").setOrigin(0.5, 0.5).setScale(2.5);
 
         // Platforms
         this.platforms = this.physics.add.staticGroup();
@@ -97,6 +98,15 @@ export default class MountainScene extends Phaser.Scene {
             fontSize: "32px",
             color: "#000",
         });
+
+        this.winText = this.add
+            .text(this.scale.width / 2, this.scale.height / 2, "You Win!", {
+                fontSize: "64px",
+                color: "#fff",
+                fontStyle: "bold",
+            })
+            .setOrigin(0.5)
+            .setVisible(false);
     }
 
     update() {
@@ -117,6 +127,10 @@ export default class MountainScene extends Phaser.Scene {
         if (this.cursors?.up.isDown && this.player.body?.touching.down) {
             this.player.setVelocityY(jumpVelocity);
         }
+
+        if (this.winText && this.winText.visible) {
+            return; // Skip the update logic if the win text is visible
+        }
     }
 
     private collectCoin(
@@ -135,7 +149,12 @@ export default class MountainScene extends Phaser.Scene {
         this.scoreText.setText(`Score: ${this.score}`);
 
         if (this.coins.countActive(true) === 0) {
-            this.scene.start("CaveScene", { score: this.score });
+            // Show the win text and stop the player
+            if (this.winText) {
+                this.winText.setVisible(true);
+            }
+            this.player.setVelocity(0);
+            this.player.anims.stop();
         }
     }
 }

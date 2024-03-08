@@ -3,6 +3,7 @@ import PlainScene from "./scenes/PlainScene";
 import PreloadScene from "./scenes/preloadScene";
 import OceanScene from "./scenes/OceanScene";
 import MountainScene from "./scenes/MountainScene";
+import CaveScene from "./scenes/CaveScene";
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -19,7 +20,7 @@ export const CONFIG = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT,
     },
-    scene: [PreloadScene, PlainScene, OceanScene],
+    scene: [PreloadScene, PlainScene, OceanScene, MountainScene, CaveScene],
     physics: {
         default: "arcade",
         arcade: {
