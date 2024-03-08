@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export default class PlainScene extends Phaser.Scene {
+export default class OceanScene extends Phaser.Scene {
     private player: Phaser.Physics.Arcade.Sprite;
     private coins: Phaser.Physics.Arcade.Group;
     private platforms: Phaser.Physics.Arcade.StaticGroup;
@@ -9,28 +9,30 @@ export default class PlainScene extends Phaser.Scene {
     private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
 
     constructor() {
-        super({ key: "PlainScene" });
+        super({ key: "OceanScene" });
     }
 
     create() {
-        // Adjust the size and position according to your game's design
-        this.add.image(400, 300, "plains").setOrigin(0.5, 0.5).setScale(2);
+        // Ocean background
+        this.add.image(600, 200, "ocean").setOrigin(0.5, 0.5).setScale(3.5);
 
         // Platforms
         this.platforms = this.physics.add.staticGroup();
         const gameWidth = this.scale.width;
-        const platformOriginalWidth = 400; // Adjust this based on your actual platform image width
+        const platformOriginalWidth = 400;
         const scale = gameWidth / platformOriginalWidth + 10;
 
         this.platforms
             .create(400, this.scale.height - 32, "platform")
-            .setScale(scale, 1) // Scale horizontally to fit the screen width, and keep vertical scale as is
+            .setScale(scale, 1)
             .refreshBody();
+
         // Player
         this.player = this.physics.add.sprite(100, 450, "player");
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);
 
+        // Player animations
         this.anims.create({
             key: "left",
             frames: this.anims.generateFrameNumbers("player", {
@@ -63,12 +65,14 @@ export default class PlainScene extends Phaser.Scene {
         // Cursors
         this.cursors = this.input.keyboard?.createCursorKeys();
 
-        // Coins setup (similar to stars in your example)
-        // Coins setup (adjusted for full coverage)
-        const numStars = Math.floor(this.scale.width / 70) - 1; // Assuming each star is roughly 70 pixels apart
+        // Retrieve score from previous scene
+        this.score = this.registry.get("coins") || 0;
+
+        // Coins
+        const numCoins = Math.floor(this.scale.width / 70) - 1;
         this.coins = this.physics.add.group({
             key: "coin",
-            repeat: numStars,
+            repeat: numCoins,
             setXY: { x: 12, y: 0, stepX: 70 },
         });
 
@@ -78,6 +82,7 @@ export default class PlainScene extends Phaser.Scene {
             return true;
         });
 
+        // Coin collection and collisions
         this.physics.add.collider(this.coins, this.platforms);
         this.physics.add.overlap(
             this.player,
@@ -87,8 +92,8 @@ export default class PlainScene extends Phaser.Scene {
             this
         );
 
-        // Score Text
-        this.scoreText = this.add.text(16, 16, "Score: 0", {
+        // Score text
+        this.scoreText = this.add.text(16, 16, `Score: ${this.score}`, {
             fontSize: "32px",
             color: "#000",
         });
@@ -122,20 +127,15 @@ export default class PlainScene extends Phaser.Scene {
             | Phaser.Types.Physics.Arcade.GameObjectWithBody
             | Phaser.Tilemaps.Tile
     ) {
-        // Safely cast the coin to the type we expect (Phaser.Physics.Arcade.Image)
         const collectedCoin = coin as Phaser.Physics.Arcade.Image;
-
-        // Disable the coin
         collectedCoin.disableBody(true, true);
 
-        // Update the score
-        let score = this.registry.get("coins") || 0;
-        this.registry.set("coins", score + 10);
-        this.scoreText.setText("Score: " + this.registry.get("coins"));
+        this.score += 10;
+        this.registry.set("coins", this.score);
+        this.scoreText.setText(`Score: ${this.score}`);
 
         if (this.coins.countActive(true) === 0) {
-            // Transition to OceanScene
-            this.scene.start("OceanScene", { score: score });
+            this.scene.start("MountainScene", { score: this.score });
         }
     }
 }
